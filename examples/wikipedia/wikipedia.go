@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/ismaelxyz/goheatmap"
-	// "github.com/dustin/go-humanize"
 	"github.com/ismaelxyz/goheatmap/schemes"
 )
 
@@ -28,14 +27,20 @@ func main() {
 	start := time.Now()
 	res, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("Error opening strem from %q: %v", url, err)
+		log.Fatalf("error opening strem from %q: %v", url, err)
 	}
-	defer res.Body.Close()
+
+	defer func() {
+		err := res.Body.Close()
+		if err != nil {
+			log.Fatalf("error when closing the body: %v", err)
+		}
+	}()
 
 	r := bufio.NewReader(res.Body)
 	_, _, err = r.ReadLine()
 	if err != nil {
-		log.Fatalf("Error reading first line: %v", err)
+		log.Fatalf("error reading first line: %v", err)
 	}
 
 	locations := make([]goheatmap.DataPoint, 0, 200000)
@@ -43,10 +48,10 @@ func main() {
 	for {
 		bytes, isPrefix, err := r.ReadLine()
 		if err != nil {
-			log.Fatalf("Error reading line: %v", err)
+			log.Fatalf("error reading line: %v", err)
 		}
 		if isPrefix {
-			log.Fatalf("Crap, that was a prefix...")
+			log.Fatalf("crap, that was a prefix...")
 		}
 		if bytes[0] != '{' {
 			break
@@ -57,7 +62,7 @@ func main() {
 		}
 		err = json.Unmarshal(bytes, &r)
 		if err != nil {
-			log.Printf("Couldn't parse %v: %v", string(bytes), err)
+			log.Printf("couldn't parse %v: %v", string(bytes), err)
 			break
 		}
 
@@ -66,20 +71,26 @@ func main() {
 	}
 	end := time.Now()
 
-	log.Printf("Parsed %s items in %s",
-		humanize.Comma(int64(len(locations))), end.Sub(start))
+	log.Printf("parsed %d items in %s",
+		int64(len(locations)), start)
 
 	out, err := os.Create("wikipedia.kmz")
 	if err != nil {
-		log.Fatalf("Error making output file:  %v", err)
+		log.Fatalf("error making output file:  %v", err)
 	}
-	defer out.Close()
+
+	defer func() {
+		err := out.Close()
+		if err != nil {
+			log.Fatalf("error when closing 'wikipedia.kmz' doc: %v", err)
+		}
+	}()
 
 	err = goheatmap.KMZ(image.Rect(0, 0, 8192, 4096), locations, 50, 96,
 		schemes.AlphaFire, out)
 	if err != nil {
-		log.Fatalf("Error generating thingy: %v", err)
+		log.Fatalf("error generating thingy: %v", err)
 	}
 
-	log.Printf("Completed heatmap generation in %s", time.Now().Sub(end))
+	log.Printf("completed heatmap generation in %s", time.Since(end))
 }
