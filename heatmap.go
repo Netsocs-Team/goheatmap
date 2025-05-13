@@ -1,5 +1,5 @@
 // Package heatmap generates heatmaps for map overlays.
-package heatmap
+package goheatmap
 
 import (
 	"image"
@@ -87,7 +87,7 @@ func placePoints(size image.Rectangle, limits limits,
 }
 
 func warm(out, in draw.Image, opacity uint8, colors []color.Color) {
-	draw.Draw(out, out.Bounds(), image.Transparent, image.ZP, draw.Src)
+	draw.Draw(out, out.Bounds(), image.Transparent, image.Point{}, draw.Src)
 	bounds := in.Bounds()
 	collen := float64(len(colors))
 	wg := &sync.WaitGroup{}
@@ -138,7 +138,11 @@ func mkDot(size float64) draw.Image {
 	md := 0.5 * math.Sqrt(math.Pow(float64(size)/2.0, 2)+math.Pow((float64(size)/2.0), 2))
 	for x := float64(0); x < size; x++ {
 		for y := float64(0); y < size; y++ {
-			d := math.Sqrt(math.Pow(x-size/2.0, 2) + math.Pow(y-size/2.0, 2))
+
+			xOffset := x - size/2.0
+			yOffset := y - size/2.0
+			d := math.Sqrt(xOffset*xOffset + yOffset*yOffset)
+
 			if d < md {
 				rgbVal := uint8(200.0*d/md + 50.0)
 				rgba := color.NRGBA{0, 0, 0, 255 - rgbVal}
@@ -166,5 +170,5 @@ func (l limits) placePoint(p DataPoint, i, dot draw.Image) {
 	pos := l.translate(p, i, dot.Bounds().Max.X)
 	dotw, doth := dot.Bounds().Max.X, dot.Bounds().Max.Y
 	draw.Draw(i, image.Rect(pos.X, pos.Y, pos.X+dotw, pos.Y+doth), dot,
-		image.ZP, draw.Over)
+		image.Point{}, draw.Over)
 }

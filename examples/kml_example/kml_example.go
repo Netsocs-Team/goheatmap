@@ -7,18 +7,18 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/dustin/go-heatmap"
-	"github.com/dustin/go-heatmap/schemes"
+	"github.com/ismaelxyz/goheatmap"
+	"github.com/ismaelxyz/goheatmap/schemes"
 )
 
 func main() {
 	// Cluster a few points randomly around Lawrence station.
-	lawrence := heatmap.P(-121.996158, 37.370713)
+	lawrence := goheatmap.P(-121.996158, 37.370713)
 
-	points := []heatmap.DataPoint{lawrence}
+	points := []goheatmap.DataPoint{lawrence}
 	for n := 0; n < 35; n++ {
 		points = append(points,
-			heatmap.P(lawrence.X()+(rand.Float64()/100.0)-0.005,
+			goheatmap.P(lawrence.X()+(rand.Float64()/100.0)-0.005,
 				lawrence.Y()+(rand.Float64()/100.0)-0.005))
 	}
 
@@ -26,15 +26,32 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating kml file:  %v", err)
 	}
-	defer kmlout.Close()
+	defer func() {
+		err := kmlout.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	imgout, err := os.Create("test.png")
 	if err != nil {
 		log.Fatalf("Error creating image file:  %v", err)
 	}
-	defer imgout.Close()
+	defer func() {
+		err := imgout.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
-	img, err := heatmap.KML(image.Rect(0, 0, 1024, 1024),
+	img, err := goheatmap.KML(image.Rect(0, 0, 1024, 1024),
 		points, 200, 128, schemes.AlphaFire, "test.png", kmlout)
-	png.Encode(imgout, img)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = png.Encode(imgout, img)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

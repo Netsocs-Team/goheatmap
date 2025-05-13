@@ -1,4 +1,4 @@
-package heatmap
+package goheatmap
 
 import (
 	"archive/zip"
@@ -8,6 +8,7 @@ import (
 	"image/color"
 	"image/png"
 	"io"
+	"log"
 )
 
 const kmlStart = `<?xml version="1.0" encoding="UTF-8"?>
@@ -63,7 +64,13 @@ func KMZ(size image.Rectangle, points []DataPoint, dotSize int, opacity uint8,
 	scheme []color.Color, out io.Writer) error {
 
 	z := zip.NewWriter(out)
-	defer z.Close()
+	defer func() {
+		err := z.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	dockml, err := z.Create("doc.kml")
 	must(err) // no known condition can cause failure here
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/dustin/go-heatmap/schemes"
+	"github.com/ismaelxyz/goheatmap/schemes"
 )
 
 func main() {
@@ -42,6 +42,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error making test.png: %v", err)
 	}
-	defer f.Close()
-	png.Encode(f, spec)
+
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	err = png.Encode(f, spec)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -21,7 +21,6 @@ func FromImage(filename string) ([]color.Color, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
 	img, _, err := image.Decode(f)
 	if err != nil {
@@ -29,10 +28,16 @@ func FromImage(filename string) ([]color.Color, error) {
 	}
 
 	rv := []color.Color{}
+	err = f.Close()
+	if err != nil {
+		return rv, err
+	}
+
 	bounds := img.Bounds()
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		rv = append(rv, img.At(0, y))
 	}
+
 	return rv, nil
 }
 

@@ -11,8 +11,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/dustin/go-heatmap"
-	"github.com/dustin/go-heatmap/schemes"
+	"github.com/ismaelxyz/goheatmap"
+	"github.com/ismaelxyz/goheatmap/schemes"
 )
 
 const maxInputLength = 10000
@@ -46,11 +46,16 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 	dotsize := parseInt(vals, "d", 200, 1, 256)
 	opacity := uint8(parseInt(vals, "o", 128, 1, 255))
 
-	defer req.Body.Close()
+	defer func() {
+		err := req.Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	lr := io.LimitReader(req.Body, maxInputLength)
 	cr := csv.NewReader(lr)
 
-	data := []heatmap.DataPoint{}
+	data := []goheatmap.DataPoint{}
 	reading := true
 	for reading {
 		rec, err := cr.Read()
@@ -62,15 +67,22 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 		default:
 			log.Printf("Other error:  %#v", err)
 			w.WriteHeader(400)
-			fmt.Fprintf(w, "Error reading data: %v", err)
+			_, err := fmt.Fprintf(w, "error reading data: %v", err)
+			if err != nil {
+				log.Fatal(err)
+			}
 			return
 		}
 	}
 
 	w.Header().Set("Content-type", "application/vnd.google-earth.kmz")
 	w.WriteHeader(200)
-	heatmap.KMZ(image.Rect(0, 0, width, height),
+
+	err := goheatmap.KMZ(image.Rect(0, 0, width, height),
 		data, dotsize, opacity, schemes.AlphaFire, w)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {

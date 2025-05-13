@@ -1,4 +1,4 @@
-package heatmap
+package goheatmap
 
 import (
 	"archive/zip"
@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dustin/go-heatmap/schemes"
+	"github.com/ismaelxyz/goheatmap/schemes"
 	"github.com/jteeuwen/imghash"
 )
 

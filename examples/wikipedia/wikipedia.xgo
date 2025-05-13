@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/dustin/go-heatmap"
-	"github.com/dustin/go-heatmap/schemes"
-	"github.com/dustin/go-humanize"
+	"github.com/ismaelxyz/goheatmap"
+	// "github.com/dustin/go-humanize"
+	"github.com/ismaelxyz/goheatmap/schemes"
 )
 
 const url = "http://single.couchbase.net/wikipedia2012/_design/places/_spatial/points?bbox=-180,-90,180,90"
@@ -38,7 +38,7 @@ func main() {
 		log.Fatalf("Error reading first line: %v", err)
 	}
 
-	locations := make([]heatmap.DataPoint, 0, 200000)
+	locations := make([]goheatmap.DataPoint, 0, 200000)
 
 	for {
 		bytes, isPrefix, err := r.ReadLine()
@@ -61,7 +61,7 @@ func main() {
 			break
 		}
 
-		locations = append(locations, heatmap.P(r.Geometry.Coordinates[0],
+		locations = append(locations, goheatmap.P(r.Geometry.Coordinates[0],
 			r.Geometry.Coordinates[1]))
 	}
 	end := time.Now()
@@ -75,7 +75,7 @@ func main() {
 	}
 	defer out.Close()
 
-	err = heatmap.KMZ(image.Rect(0, 0, 8192, 4096), locations, 50, 96,
+	err = goheatmap.KMZ(image.Rect(0, 0, 8192, 4096), locations, 50, 96,
 		schemes.AlphaFire, out)
 	if err != nil {
 		log.Fatalf("Error generating thingy: %v", err)
