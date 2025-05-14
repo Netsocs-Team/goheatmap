@@ -10,9 +10,10 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
-	"github.com/ismaelxyz/goheatmap"
-	"github.com/ismaelxyz/goheatmap/schemes"
+	"github.com/Netsocs-Team/goheatmap"
+	"github.com/Netsocs-Team/goheatmap/schemes"
 )
 
 const maxInputLength = 10000
@@ -89,5 +90,16 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", rootHandler)
-	log.Fatal(http.ListenAndServe(":1756", nil))
+
+	srv := &http.Server{
+		Addr:         ":1756",
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

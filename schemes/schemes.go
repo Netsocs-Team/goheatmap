@@ -17,7 +17,7 @@ import (
 // The image should have all of the colors you want to use arranged vertically
 // with the "coldest" on the bottom and the "hottest" on the top.
 func FromImage(filename string) ([]color.Color, error) {
-	f, err := os.Open(filename)
+	f, err := os.Open(filename) // #nosec G304
 	if err != nil {
 		return nil, err
 	}

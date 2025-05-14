@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ismaelxyz/goheatmap"
-	"github.com/ismaelxyz/goheatmap/schemes"
+	"github.com/Netsocs-Team/goheatmap"
+	"github.com/Netsocs-Team/goheatmap/schemes"
 )
 
 const url = "http://single.couchbase.net/wikipedia2012/_design/places/_spatial/points?bbox=-180,-90,180,90"

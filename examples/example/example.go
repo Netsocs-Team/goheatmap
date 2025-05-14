@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/ismaelxyz/goheatmap"
-	"github.com/ismaelxyz/goheatmap/schemes"
+	"github.com/Netsocs-Team/goheatmap"
+	"github.com/Netsocs-Team/goheatmap/schemes"
 )
 
 func main() {

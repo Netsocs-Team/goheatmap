@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/ismaelxyz/goheatmap"
-	"github.com/ismaelxyz/goheatmap/schemes"
+	"github.com/Netsocs-Team/goheatmap"
+	"github.com/Netsocs-Team/goheatmap/schemes"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	lawrence := goheatmap.P(-121.996158, 37.370713)
 
 	points := []goheatmap.DataPoint{lawrence}
-	for n := 0; n < 35; n++ {
+	for range 35 {
 		points = append(points,
 			goheatmap.P(lawrence.X()+(rand.Float64()/100.0)-0.005,
 				lawrence.Y()+(rand.Float64()/100.0)-0.005))
